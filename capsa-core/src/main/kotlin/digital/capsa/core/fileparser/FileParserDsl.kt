@@ -45,7 +45,8 @@ class Parser(private val bufferedReader: BufferedReader) {
             records[lineIndex].value = recordParser.parse()
             records[lineIndex].issues.addAll(recordParser.issues)
         } catch (e: Exception) {
-            records[lineIndex].issues.add(FileParserError(e.message ?: "Unknown parser error"))
+            // do nothing
+            // records[lineIndex].issues.add(FileParserError(e.message ?: "Unknown parser error"))
         }
     }
 
@@ -84,10 +85,11 @@ class RecordParser(
                 }
             } catch (e: Exception) {
                 if (ignoreError) {
-                    issues.add(FileParserWarning(e.message ?: "Unknown parser warning"))
+                    issues.add(FileParserWarning(e.message ?: "Unknown parser warning", index))
                     null
                 } else {
-                    throw e
+                    issues.add(FileParserError(e.message ?: "Unknown parser warning", index))
+                    null
                 }
             }
         } else default.invoke()
@@ -123,10 +125,16 @@ fun parser(
     return parser
 }
 
-data class FileParserWarning(override var message: String = "Unknown parser warning") : FileParserIssue(message)
+data class FileParserWarning(
+    override var message: String = "Unknown parser warning",
+    override val index: Int? = null
+    ) : FileParserIssue(message, index)
 
-data class FileParserError(override var message: String = "Unknown parser error") : FileParserIssue(message)
+data class FileParserError(
+    override var message: String = "Unknown parser error",
+    override val index: Int? = null
+    ) : FileParserIssue(message, index)
 
-abstract class FileParserIssue(open var message: String)
+abstract class FileParserIssue(open var message: String, open val index: Int?)
 
 open class FileParserException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
