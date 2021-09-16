@@ -36,17 +36,16 @@ class Parser(private val bufferedReader: BufferedReader) {
 
     private fun processLine(lineIndex: Int, length: Int?, parse: RecordParser.() -> Any) {
         try {
-            length?.let {
-                if (records[lineIndex].str.length != it) {
-                    records[lineIndex].issues.add(FileParserError("Line length should be $length but was ${records[lineIndex].str.length}"))
-                }
+        length?.let {
+            if (records[lineIndex].str.length != it) {
+                records[lineIndex].issues.add(FileParserError("Line length should be $length but was ${records[lineIndex].str.length}"))
             }
-            val recordParser = RecordParser(records[lineIndex].str, lineIndex)
-            records[lineIndex].value = recordParser.parse()
-            records[lineIndex].issues.addAll(recordParser.issues)
+        }
+        val recordParser = RecordParser(records[lineIndex].str, lineIndex)
+        records[lineIndex].value = recordParser.parse()
+        records[lineIndex].issues.addAll(recordParser.issues)
         } catch (e: Exception) {
-            // do nothing
-            // records[lineIndex].issues.add(FileParserError(e.message ?: "Unknown parser error"))
+            // do nothing - is used to escape assignment on non-nullable value
         }
     }
 
@@ -89,7 +88,7 @@ class RecordParser(
                     null
                 } else {
                     issues.add(FileParserError(e.message ?: "Unknown parser warning", index))
-                    null
+                    throw e
                 }
             }
         } else default.invoke()
@@ -106,7 +105,12 @@ class RecordParser(
     ): R {
         val str = readField(from, toExclusive)
         return if (str.isNotBlank()) {
-            parser?.let { parser(str) } ?: defaultTypeParser(str)
+            try {
+                parser?.let { parser(str) } ?: defaultTypeParser(str)
+            } catch (e: Exception) {
+                issues.add(FileParserError(e.message ?: "Unknown parser warning", index))
+                throw e
+            }
         } else default.invoke()
     }
 
@@ -128,12 +132,12 @@ fun parser(
 data class FileParserWarning(
     override var message: String = "Unknown parser warning",
     override val index: Int? = null
-    ) : FileParserIssue(message, index)
+) : FileParserIssue(message, index)
 
 data class FileParserError(
     override var message: String = "Unknown parser error",
     override val index: Int? = null
-    ) : FileParserIssue(message, index)
+) : FileParserIssue(message, index)
 
 abstract class FileParserIssue(open var message: String, open val index: Int?)
 
