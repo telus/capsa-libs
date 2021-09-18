@@ -38,7 +38,9 @@ class Parser(private val bufferedReader: BufferedReader) {
         try {
             length?.let {
                 if (records[lineIndex].str.length != it) {
-                    records[lineIndex].issues.add(FileParserError(-1, "Line length should be $length but was ${records[lineIndex].str.length}"))
+                    records[lineIndex].issues.add(FileParserError(
+                        message = "Line length should be $length but was ${records[lineIndex].str.length}")
+                    )
                 }
             }
             val recordParser = RecordParser(records[lineIndex].str, lineIndex)
@@ -130,18 +132,18 @@ fun parser(
 }
 
 data class FileParserWarning(
-    override val from: Int? = null,
-    override var message: String? = "Unknown parser warning on position $from"
+    override val position: Int? = null,
+    override var message: String? = "Unknown parser warning${position?.let { " on position $it" }}"
 ) : FileParserIssue
 
 data class FileParserError(
-    override val from: Int? = null,
-    override var message: String? = "Unknown parser error on position $from"
+    override val position: Int? = null,
+    override var message: String? = "Unknown parser error${position?.let { " on position $it" }}"
 ) : FileParserIssue
 
 sealed interface FileParserIssue {
     var message: String?
-    val from: Int?
+    val position: Int?
 }
 
 open class FileParserException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
