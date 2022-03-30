@@ -132,7 +132,7 @@ class FileParserBasicDslTest {
     }
 
     @Test
-    fun `field toExclusive ends before line length`() {
+    fun `line length ends before last fields toExclusive`() {
         data class CustomItem(val string1: String?, val string2: String, val int1: Int?, val date1: String?)
 
         val parser = parser(
