@@ -3,6 +3,7 @@ package digital.capsa.it.httprequest
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
+import digital.capsa.it.TestConfig
 import digital.capsa.it.Tuple2
 import digital.capsa.it.gherkin.given
 import digital.capsa.it.json.isJsonWhere

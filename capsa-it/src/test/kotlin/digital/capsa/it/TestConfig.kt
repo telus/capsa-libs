@@ -1,4 +1,4 @@
-package digital.capsa.it.httprequest
+package digital.capsa.it
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
