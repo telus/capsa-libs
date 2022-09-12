@@ -43,12 +43,14 @@ class EmailReceiverService(
         subject: String? = null,
         numRetries: Int = NUM_RETRYES
     ): List<MimeMessage> {
-        logger.info("Trying to get email for $to, number of retries left is $numRetries")
+        logger.info("Trying to get email for: $to, $subject, $numRetries")
 
         for (i in 0 until numRetries) {
             if (i != 0) {
                 Time.sleep(RETRY_TIMEOUT)
             }
+
+            logger.info("Try #$i to get email for: $to, $subject, $numRetries")
 
             val messages =
                 try {
@@ -62,6 +64,8 @@ class EmailReceiverService(
             }
         }
 
+        logger.warn("No email found for: $to, $subject, $numRetries")
+
         return emptyList()
     }
 
@@ -72,6 +76,7 @@ class EmailReceiverService(
     ): List<MimeMessage> {
         val email = extractMainEmail(to)
         val imapMailReceiver = imapMailReceiver(email)
+        imapMailReceiver.isShouldMarkMessagesAsRead
         val messages = imapMailReceiver.receive().filter { message ->
             message is MimeMessage && message.allRecipients.toList().map { it.toString() }.contains(to)
                     && if (subject != null) message.subject.toString().contains(subject) else true
