@@ -60,6 +60,11 @@ class EmailReceiverService(
                 }
 
             if (messages.isNotEmpty()) {
+                if (messages.size > 1) {
+                    logger.warn("Found more than one email for $to, number of emails - ${messages.size}")
+                }
+                logger.info("Email for $to is found, subject is ${messages[0].subject}")
+
                 return messages
             }
         }
@@ -76,20 +81,14 @@ class EmailReceiverService(
     ): List<MimeMessage> {
         val email = extractMainEmail(to)
         val imapMailReceiver = imapMailReceiver(email)
-        imapMailReceiver.isShouldMarkMessagesAsRead
-        val messages = imapMailReceiver.receive().filter { message ->
+        imapMailReceiver.setShouldDeleteMessages(false)
+        imapMailReceiver.setShouldMarkMessagesAsRead(false)
+        return imapMailReceiver.receive().filter { message ->
             message is MimeMessage && message.allRecipients.toList().map { it.toString() }.contains(to)
                     && if (subject != null) message.subject.toString().contains(subject) else true
         }.map {
             it as MimeMessage
         }
-
-        if (messages.size > 1) {
-            logger.warn("Found more than one email for $email, number of emails - ${messages.size}")
-        }
-        logger.info("Email for $email is found, subject is ${messages[0].subject}")
-
-        return messages
     }
 
     private fun extractMainEmail(to: String): String {
