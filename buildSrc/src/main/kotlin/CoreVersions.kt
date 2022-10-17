@@ -4,8 +4,6 @@ object CoreVersion {
     const val ASSERTK_JVM = "0.25"
     const val GUAVA = "31.1-jre"
     const val JAVA_JWT = "4.0.0"
-    const val JAXB_API = "2.3.1"
-    const val JAXB_IMPL = "4.0.0"
     const val JMETER = "5.5"
     const val JMETER_JPGC_CASUTG = "2.10"
     const val OPENAPI = "1.6.9"
