@@ -10,7 +10,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.httpcomponents:httpclient")
     implementation("org.apache.httpcomponents:httpmime")
-    implementation("org.hamcrest:java-hamcrest")
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-script-runtime")

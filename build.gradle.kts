@@ -22,26 +22,22 @@ subprojects {
     group = "telus.capsa"
 
     java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         withJavadocJar()
         withSourcesJar()
     }
 
-
     tasks.withType<Detekt> {
-        failFast = false
-        jvmTarget = "17"
+        jvmTarget = java.targetCompatibility.toString()
         config.setFrom(rootProject.file("detekt.yml"))
-    }
-
-    tasks.withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+        allRules = false
     }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
+            jvmTarget = java.targetCompatibility.toString()
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "17"
         }
     }
 
@@ -59,7 +55,6 @@ subprojects {
         }
         dependencies {
             dependency("com.willowtreeapps.assertk:assertk-jvm:${CoreVersion.ASSERTK_JVM}")
-            dependency("org.hamcrest:java-hamcrest:${CoreVersion.JAVA_HAMCREST}")
             dependency("com.github.tomakehurst:wiremock-jre8:${CoreVersion.WIREMOCK_JRE8}")
             dependency("com.google.guava:guava:${CoreVersion.GUAVA}")
             dependency("org.springdoc:springdoc-openapi-ui:${CoreVersion.OPENAPI}")

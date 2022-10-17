@@ -3,7 +3,6 @@
 object CoreVersion {
     const val ASSERTK_JVM = "0.25"
     const val GUAVA = "31.1-jre"
-    const val JAVA_HAMCREST = "2.0.0.0"
     const val JAVA_JWT = "4.0.0"
     const val JAXB_API = "2.3.1"
     const val JAXB_IMPL = "4.0.0"
