@@ -108,10 +108,35 @@ class JsonPathValidatorTest {
               "array3": []
             }
         """.trimIndent(), listOf(
-                ValidationRule("$.array1", OpType.Size, 3),
-                ValidationRule("$.array2", OpType.Size, 2),
-                ValidationRule("$.array3", OpType.Size, 0)
+                ValidationRule("$.array1[*]", OpType.Size, 3),
+                ValidationRule("$.array2[*]", OpType.Size, 2),
+                ValidationRule("$.array3[*]", OpType.Size, 0)
             )
         )
     }
+
+    @Test
+    @Suppress("FunctionNaming")
+    fun testValidator_inner_size() {
+        JsonPathValidator.assertJson(
+            """
+            {
+              "parent": [
+                {
+                  "name": "name1",
+                  "array1": ["123", "234", "345"],
+                  "array2": ["123", "123"],
+                  "array3": []
+                }
+              ]
+            }    
+        """.trimIndent(), listOf(
+                ValidationRule("$.parent[?(@.name == \"name1\")].array1[*]", OpType.Size, 3),
+                ValidationRule("$.parent[?(@.name == \"name1\")].array2[*]", OpType.Size, 2),
+                ValidationRule("$.parent[?(@.name == \"name1\")].array3[*]", OpType.Size, 0)
+            )
+        )
+    }
+
+
 }
