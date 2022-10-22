@@ -32,9 +32,11 @@ abstract class Aggregate(private val aggregateName: String) {
 
     abstract fun onCreate(pass: Pass)
 
-    protected fun <T : Aggregate> initAggregate(aggregate: T, init: T.() -> Unit): T {
+    protected fun <T : Aggregate> addAggregate(aggregate: T, init: T.() -> Unit): T {
         aggregate.parent = this
         children.add(aggregate)
+        aggregate.randomSeed = Random(aggregate.getPath().hashCode().toLong()).nextLong()
+        aggregate.onConstruct()
         aggregate.init()
         return aggregate
     }
