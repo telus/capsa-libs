@@ -57,8 +57,8 @@ internal class TestRunner {
         }.then { response ->
             assertThat(response.statusCode.value()).isEqualTo(200)
             assertThat(response.body).isJsonWhere(
-                ValidationRule("numberOfFilesReceived", OpType.equal, numberOfFiles),
-                ValidationRule("numberOfFilesSent", OpType.equal, numberOfFiles)
+                ValidationRule("numberOfFilesReceived", OpType.Equal, numberOfFiles),
+                ValidationRule("numberOfFilesSent", OpType.Equal, numberOfFiles)
             )
         }
     }

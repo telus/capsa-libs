@@ -5,6 +5,7 @@ import assertk.assertions.matches
 import digital.capsa.it.validation.OpType
 import digital.capsa.it.validation.ValidationRule
 import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
+import org.opentest4j.AssertionFailedError
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 import java.io.StringReader
@@ -45,7 +46,7 @@ object XmlPathValidator {
             if (nodes.length <= 0) {
                 throw Error("Path not found, document: $document, path: ${rule.path}")
             } else if (nodes.length > 1) {
-                if (rule.op != OpType.equal) {
+                if (rule.op != OpType.Equal) {
                     throw Error("'${rule.op}' op is not supported for XML array result. Use 'equal' op")
                 }
                 val valueSet = mutableSetOf<String>()
@@ -60,22 +61,26 @@ object XmlPathValidator {
             } else {
                 val value = nodes.item(0).textContent
                 when (rule.op) {
-                    OpType.regex ->
+                    OpType.Regex ->
                         assertThat(
                             value,
                             "XML path ${rule.path} validation failed, document: $document"
                         ).matches(Regex(valueList[0].toString()))
-                    OpType.equal ->
+                    OpType.Equal ->
                         assertEquals(
                             valueList[0],
                             value,
                             "XML path ${rule.path} validation failed, document: $document"
                         )
-                    OpType.like ->
+                    OpType.Like ->
                         assertThat(
                             value,
                             "XML path ${rule.path} validation failed, document: $document"
                         ).matches(Regex(".*${valueList[0]}.*", RegexOption.DOT_MATCHES_ALL))
+                    OpType.Size ->
+                        throw AssertionFailedError(
+                            "'Size' op is not supported for String result."
+                        )
                 }
             }
         }

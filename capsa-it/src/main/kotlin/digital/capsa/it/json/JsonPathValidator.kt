@@ -7,6 +7,7 @@ import com.jayway.jsonpath.JsonPath
 import digital.capsa.it.validation.OpType
 import digital.capsa.it.validation.ValidationRule
 import net.minidev.json.JSONArray
+import org.opentest4j.AssertionFailedError
 import kotlin.test.assertEquals
 
 object JsonPathValidator {
@@ -15,7 +16,7 @@ object JsonPathValidator {
         val document = Configuration.defaultConfiguration().jsonProvider().parse(json)
 
         for (rule in rules) {
-            val valueList: List<Any?> = if (rule.value is List<*>) {
+            val values: List<Any?> = if (rule.value is List<*>) {
                 rule.value
             } else {
                 listOf(rule.value)
@@ -24,68 +25,83 @@ object JsonPathValidator {
             try {
                 jsonPath = JsonPath.read(document, rule.path)
             } catch (e: Exception) {
-                throw Error("Path not found, document: $document, path: ${rule.path}", e)
+                throw AssertionFailedError("Path not found, document: $document, path: ${rule.path}", e)
             }
             if (jsonPath == null) {
                 assertEquals(
-                    valueList[0], null, "json path ${rule.path} validation failed, document: $document"
+                    values[0], null, "json path ${rule.path} validation failed, document: $document"
                 )
             } else
                 when (jsonPath) {
                     is JSONArray -> {
-                        if (rule.op != OpType.equal) {
-                            throw Error("'${rule.op}' op is not supported for JSONArray result. Use 'equal' op")
-                        }
-                        if (jsonPath.size == 0) {
-                            assertEquals(
-                                valueList.size,
-                                0,
-                                "json path ${rule.path} validation failed, document: $document"
-                            )
-                        } else {
-                            assertEquals(
-                                valueList.toSet(),
-                                jsonPath.toSet(),
-                                "json path ${rule.path} validation failed, document: $document"
+                        when (rule.op) {
+                            OpType.Equal -> {
+                                if (jsonPath.size == 0) {
+                                    assertEquals(
+                                        values.size,
+                                        0,
+                                        "Json path ${rule.path} validation failed. Document: $document"
+                                    )
+                                } else {
+                                    assertEquals(
+                                        values.toSet(),
+                                        jsonPath.toSet(),
+                                        "Json path ${rule.path} validation failed. Document: $document"
+                                    )
+                                }
+                            }
+                            OpType.Size -> {
+                                assertEquals(
+                                    values[0],
+                                    jsonPath.size,
+                                    "Json path ${rule.path} validation failed. Document: $document"
+                                )
+                            }
+                            else -> throw AssertionFailedError(
+                                throw AssertionFailedError("'${rule.op}' op is not supported for JSONArray result. Use 'equal' op")
                             )
                         }
                     }
                     is Number -> {
-                        if (rule.op != OpType.equal) {
-                            throw Error("${rule.op} op is not supported for Number result. Use 'equal' op")
+                        if (rule.op != OpType.Equal) {
+                            throw AssertionFailedError("${rule.op} op is not supported for Number result. Use 'equal' op")
                         }
                         assertEquals(
-                            valueList[0], jsonPath, "json path ${rule.path} validation failed, document: $document"
+                            values[0], jsonPath, "Json path ${rule.path} validation failed. Document: $document"
                         )
                     }
                     is Boolean -> {
-                        if (rule.op != OpType.equal) {
-                            throw Error("${rule.op} op is not supported for Boolean result. Use 'equal' op")
+                        if (rule.op != OpType.Equal) {
+                            throw AssertionFailedError("${rule.op} op is not supported for Boolean result. Use 'equal' op")
                         }
                         assertEquals(
-                            valueList[0], jsonPath, "json path ${rule.path} validation failed, document: $document"
+                            values[0], jsonPath, "Json path ${rule.path} validation failed. Document: $document"
                         )
                     }
                     is String ->
                         when (rule.op) {
-                            OpType.regex ->
+                            OpType.Regex ->
                                 assertThat(
                                     jsonPath,
-                                    "json path ${rule.path} validation failed, document: $document"
-                                ).matches(Regex(valueList[0].toString(), RegexOption.DOT_MATCHES_ALL))
-                            OpType.equal ->
+                                    "json path ${rule.path} validation failed. Document: $document"
+                                ).matches(Regex(values[0].toString(), RegexOption.DOT_MATCHES_ALL))
+                            OpType.Equal ->
                                 assertEquals(
-                                    valueList[0],
+                                    values[0],
                                     jsonPath,
-                                    "json path ${rule.path} validation failed, document: $document"
+                                    "Json path ${rule.path} validation failed. Document: $document"
                                 )
-                            OpType.like ->
+                            OpType.Like ->
                                 assertThat(
                                     jsonPath,
-                                    "json path ${rule.path} validation failed, document: $document"
-                                ).matches(Regex(".*${valueList[0]}.*", RegexOption.DOT_MATCHES_ALL))
+                                    "Json path ${rule.path} validation failed. Document: $document"
+                                ).matches(Regex(".*${values[0]}.*", RegexOption.DOT_MATCHES_ALL))
+                            OpType.Size ->
+                                throw AssertionFailedError(
+                                    "'Size' op is not supported for String result."
+                                )
                         }
-                    else -> throw Error("Expected JSONArray or Number or String, received ${jsonPath.let { it::class }}")
+                    else -> throw AssertionFailedError("Expected JSONArray or Number or String, received ${jsonPath.let { it::class }}")
                 }
         }
     }
