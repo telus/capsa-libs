@@ -81,6 +81,10 @@ abstract class Aggregate(private val aggregateName: String) {
         return children.filter { it is T && key == it.key }[0] as T
     }
 
+    inline fun <reified T> getAllChildren(): Set<T> {
+        return children.filter { it is T }.toSet() as Set<T>
+    }
+
     open fun getChildIndex(aggregate: Aggregate): Int {
         return children.subList(0, children.indexOf(aggregate)).count { aggregate::class.isInstance(it) }
     }
