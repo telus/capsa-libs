@@ -1,7 +1,6 @@
 package digital.capsa.it.email
 
 import digital.capsa.core.logger
-import org.apache.tomcat.jni.Time
 import org.springframework.beans.factory.BeanFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.integration.mail.ImapMailReceiver
@@ -10,6 +9,7 @@ import org.springframework.stereotype.Component
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.mail.Flags
 import javax.mail.Folder
 import javax.mail.MessagingException
@@ -47,7 +47,7 @@ class EmailReceiverService(
 
         for (i in 0 until numRetries) {
             if (i != 0) {
-                Time.sleep(RETRY_TIMEOUT)
+                TimeUnit.MILLISECONDS.sleep(RETRY_TIMEOUT)
             }
 
             logger.info("Try #$i to get email for: $to, $subject, $numRetries")
