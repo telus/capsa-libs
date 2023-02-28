@@ -110,7 +110,7 @@ subprojects {
 
         repositories {
             maven {
-                name = "Google Artifact Registry"
+                name = "GoogleArtifactRegistry"
                 url = uri("artifactregistry://northamerica-northeast1-maven.pkg.dev/cio-gke-devops-e4993356/telus-maven")
             }
             maven {
