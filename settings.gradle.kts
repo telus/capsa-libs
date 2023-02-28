@@ -13,6 +13,7 @@ pluginManagement {
         id("io.gitlab.arturbosch.detekt") version gradlePluginVersion.DETEKT_VERSION
         id("com.gradle.enterprise") version gradlePluginVersion.GRADLE_ENTERPRISE_VERSION
         id("com.moowork.node") version gradlePluginVersion.MOOWORK_VERSION
+        id("com.google.cloud.artifactregistry.gradle-plugin") version "2.2.0"
         kotlin("jvm") version gradlePluginVersion.KOTLIN_GRADLE_VERSION
         kotlin("plugin.allope") version gradlePluginVersion.KOTLIN_GRADLE_VERSION
         kotlin("plugin.noarg") version gradlePluginVersion.KOTLIN_GRADLE_VERSION

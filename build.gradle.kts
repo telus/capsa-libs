@@ -6,6 +6,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt") apply false
     id("io.spring.dependency-management")
     id("org.springframework.boot") apply false
+    id("com.google.cloud.artifactregistry.gradle-plugin") apply false
     kotlin("jvm") apply false
     kotlin("plugin.spring") apply false
     idea
@@ -18,6 +19,7 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "org.springframework.boot")
+    apply(plugin = "com.google.cloud.artifactregistry.gradle-plugin")
 
     group = "telus.capsa"
 
@@ -107,6 +109,10 @@ subprojects {
         }
 
         repositories {
+            maven {
+                name = "Google Artifact Registry"
+                url = uri("artifactregistry://northamerica-northeast1-maven.pkg.dev/cio-gke-devops-e4993356/telus-maven")
+            }
             maven {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/telus/capsa-telus-libs")
